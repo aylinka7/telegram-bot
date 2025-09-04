@@ -4,6 +4,7 @@ from telebot import types
 import sqlite3
 
 bot = telebot.TeleBot('8144343729:AAFGKcrgYcJwL59Wp1kq_bGKaFc_g6J408w')
+name  = None
 
 @bot.message_handler(commands=['site'])
 def site(message):
@@ -25,12 +26,12 @@ def start(message):
 
     conn = sqlite3.connect('raspisanie.sql')
     cur = conn.cursor()
-
     cur.execute('CREATE TABLE IF NOT EXISTS users (id int auto_increment PRIMARY KEY, name varchar(50), pass varchar(50))')
     conn.commit()
     cur.close()
     conn.close()
 
+    bot.send_message(message.chat.id, f'Привет, {message.from_user.first_name}, введи свое имя для регистрации')
     bot.register_next_step_handler(message, user_name)
 
 def on_click(message):
@@ -42,7 +43,23 @@ def on_click(message):
 
 
 def user_name(message):
-    pass
+    global name
+    name = message.text.strip()
+    bot.send_message(message.chat.id, 'Введите пароль!')
+    bot.register_next_step_handler(message, user_pass)
+
+def user_pass(message):
+    password = message.text.strip()
+    conn = sqlite3.connect('raspisanie.sql')
+    cur = conn.cursor()
+    cur.execute("INSERT INTO users (name, pass) VALUES ('%s', '%s')" % (name, password))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton('Список пользователей', callback_data='users'))
+    bot.send_message(message.chat.id, 'Пользователь зарегистрирован!', reply_markup=markup)
 
 @bot.message_handler(commands=['help'])
 def main(message):
@@ -64,11 +81,39 @@ def callback_message(callback):
         bot.delete_message(callback.message.chat.id, callback.message.message_id - 1)
     elif callback.data == 'edit':
         bot.edit_message_text('Edit text', callback.message.chat.id, callback.message.message_id)
+    elif callback.data == 'users':
+        conn = sqlite3.connect('raspisanie.sql')
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users")
+        users = cur.fetchall()
+
+        info = ''
+        for el in users:
+            info += f'Имя: {el[1]}, пароль: {el[2]}\n'
+
+        cur.close()
+        conn.close()
+        bot.send_message(callback.message.chat.id, info)
+
+# @bot.callback_query_handler(func=lambda callback: True)
+# def callback(call):
+#     conn = sqlite3.connect('raspisanie.sql')
+#     cur = conn.cursor()
+#     cur.execute("SELECT * FROM users")
+#     users = cur.fetchall()
+#
+#     info = ''
+#     for el in users:
+#         info += f'Имя: {el[1]}, пароль: {el[2]}\n'
+#
+#     cur.close()
+#     conn.close()
+#     bot.send_message(call.message.chat.id, info)
 
 @bot.message_handler()
 def info(message):
     if message.text.lower() == 'привет':
-        bot.send_message(message.chat.id, f'Привет еще раз!')
+        bot.send_message(message.chat.id, 'Привет еще раз!')
 
 
 
