@@ -1,9 +1,13 @@
+import os
+from dotenv import load_dotenv
 import telebot
 import webbrowser
 from telebot import types
 import sqlite3
 
-bot = telebot.TeleBot('8144343729:AAFGKcrgYcJwL59Wp1kq_bGKaFc_g6J408w')
+load_dotenv()
+TOKEN = os.getenv("TELEGRAM_TOKEN")
+bot = telebot.TeleBot(TOKEN)
 name  = None
 
 @bot.message_handler(commands=['site'])
