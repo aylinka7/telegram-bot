@@ -22,15 +22,7 @@ def start(message):
     # bot.send_audio(message.chat.id, file, reply_markup=markup)
     # bot.send_message(message.chat.id, f'Привет, {message.from_user.first_name}!', reply_markup=markup)
     bot.register_next_step_handler(message, on_click)
-    # bot.register_next_step_handler(message, database)
 
-def on_click(message):
-    if message.text == 'Перейти на сайт':
-        bot.send_message(message.chat.id, 'Сайт открыт')
-    elif message.text == 'Удалить фото':
-        bot.send_message(message.chat.id, 'Удалено')
-
-def database(message):
     conn = sqlite3.connect('raspisanie.sql')
     cur = conn.cursor()
 
@@ -40,6 +32,14 @@ def database(message):
     conn.close()
 
     bot.register_next_step_handler(message, user_name)
+
+def on_click(message):
+    if message.text == 'Перейти на сайт':
+        bot.send_message(message.chat.id, 'Сайт открыт')
+    elif message.text == 'Удалить фото':
+        bot.send_message(message.chat.id, 'Удалено')
+
+
 
 def user_name(message):
     pass
