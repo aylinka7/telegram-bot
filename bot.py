@@ -140,15 +140,6 @@ def daily_scheduler():
 
 # =================== КОМАНДЫ ===================
 @bot.message_handler(commands=['start'])
-# def start(message):
-#     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-#     start_btn = types.KeyboardButton("Старт")
-#     markup.add(start_btn)
-#     bot.send_message(message.chat.id, f"Привет, {message.from_user.first_name}! "
-#                                       f"Нажми 'Старт', чтобы открыть меню.", reply_markup=markup)
-#
-
-# @bot.message_handler(func=lambda message: message.text == "Старт")
 def show_menu(message):
     markup = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
     bot.send_message(message.chat.id, f"Привет, {message.from_user.first_name}! ", reply_markup=markup)
